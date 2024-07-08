@@ -1,5 +1,5 @@
-# 🌋 LLaVA-ICL
-## relies heavily on LLaVA. start by having working LLaVa code and enviroment.
+# :heart_eyes_cat: LLaVA-ICL WIP!
+## Relies heavily on LLaVA. Start by having working LLaVA code and enviroment.
 
 Link to files for LLava-ICL [https://drive.google.com/drive/folders/1Zb3sqQaD23gOc0flHqeBmGdFv0T_55kw?usp=sharing]
 
@@ -17,4 +17,8 @@ python llava/eval/ICL_model_vqa_FS.py --question_prompt '{question_prompts}' --e
 ```bash
 python llava/eval/ICL_model_vqa_FS.py --reverse_order --question_prompt '{question_prompts}' --episodes_path {path to FS single dataset (CUB/flowers/cars/...)} --model-path {model_path} --output_file 'output_file_name.json'
 ```
-                    
+# questions prompt used for FS evaluation:
+```bash
+question_prompts=["What is the breed of the dog in the image?","What is the type of the bird in the image?","What is the type of the flower in the image?","What is the type of the food in the image?","What is the model of the car in the image?"]
+```
+
