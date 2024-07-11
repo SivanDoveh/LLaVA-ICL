@@ -51,14 +51,14 @@ python llava/eval/ICL_model_vqa_FS.py --question_prompt '{question_prompts}' \
 --episodes_path {path to FS single dataset (CUB/flowers/cars/...)} \
 --model-path {model_path} --output_file 'output_file_name.json'
 ```
-2. During the research process, we found a huge performance gap in models when the order of the answers changed. so we evaluate both orders with and without "--reverse_order" and average the results
+2. During the research process, we found a huge performance gap in models when the order of the answers changed. so we evaluate both orders with and without "--reverse_order" and average the results. To run the reverse order run this line:
 ```bash
 python llava/eval/ICL_model_vqa_FS.py --reverse_order --question_prompt '{question_prompts}' \
 --episodes_path {path to FS single dataset (CUB/flowers/cars/...)} \
 --model-path {model_path} --output_file 'output_file_name.json'
 ```
 
-EXAMPLE for running evaluation on our FS-ICL CUB dataset:
+- EXAMPLE for running evaluation on our FS-ICL CUB dataset:
 ```bash
 python llava/eval/ICL_model_vqa_FS.py --question_prompt 'What is the type of the bird in the image?' \
 --episodes_path './FS_pkls/CUB_2way_1shot_episodes.pkl' \
@@ -72,12 +72,12 @@ question_prompts=["What is the breed of the dog in the image?","What is the type
 "What is the model of the car in the image?"]
 ```
 ## Few Shot ICL Classification Evaluations on YOUR data
-you need to prepare a list of dictionaries in this format
-
+- Prepare a list of dictionaries in this format
+```bash
 {'test_image': 'path/to/image/query_image.jpg', 'test_class': 'class of test image- same as positive example class', 'positive_images': ['path/to/positive class image'], 'negs': [{'neg_images': ['path/to/negative class image'], 'neg_class': 'class of negative image'}]}]
-
-#### How does the prompt need to look before getting into LLaVA-ICL?
-The FS dataset and the data loader in ICL_model_vqa_FS will convert your pickle data file to look like this conversation: (Insert the images as a list of 3 images)
+```
+- How does the prompt need to look before getting into LLaVA-ICL?
+  - The FS dataset and the data loader in ICL_model_vqa_FS will convert your pickle data file to look like this conversation: (Insert the images as a list of 3 images)
 
 ```bash
 chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions. USER: <image>
