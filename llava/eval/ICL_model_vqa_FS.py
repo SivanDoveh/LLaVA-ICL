@@ -90,8 +90,8 @@ def eval_model(args):
             GT = list_of_chars[test_ind]
             counter += GT==outputs
 
-            if (i + 1) % 100 == 0:
-                print(f"i={i} accuracy: {str(counter/(i+1))}")
+            # if (i + 1) % 100 == 0:
+            #     print(f"i={i} accuracy: {str(counter/(i+1))}")
 
     print(f"accuracy: {str(counter/(i+1))}")
     item = {
