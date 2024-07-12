@@ -45,15 +45,9 @@ LLaVA-ICL
   - The model folder contains a trained LLAVA-ICL Model that can be evaluated just like vanilla-lava but also on img+text sequences.
 
 ## Few Shot Classification Evaluations on our FS-ICL data
-1. To evaluate our LLaVa-ICL model on a single FS data(episode path= the path for that FS JSON you should have downloaded from the drive), you can use this line:
+- To evaluate our LLaVa-ICL model on a single FS data(episode path= the path for that FS JSON you should have downloaded from the drive), you can use this line:
 ```bash
 python llava/eval/ICL_model_vqa_FS.py --question_prompt '{question_prompts}' \
---episodes_path {path to FS single dataset (CUB/flowers/cars/...)} \
---model-path {model_path} --output_file 'output_file_name.json'
-```
-2. During the research process, we found a huge performance gap in models when the order of the answers changed. so we evaluate both orders with and without "--reverse_order" and average the results. To run the reverse order run this line:
-```bash
-python llava/eval/ICL_model_vqa_FS.py --reverse_order --question_prompt '{question_prompts}' \
 --episodes_path {path to FS single dataset (CUB/flowers/cars/...)} \
 --model-path {model_path} --output_file 'output_file_name.json'
 ```
