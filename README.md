@@ -1,4 +1,4 @@
-# :heart_eyes_cat: LLaVA-ICL WIP!
+# :heart_eyes_cat: LLaVA-ICL
 ## Relies heavily on LLaVA. Start by having a working LLaVA environment.
 
 First, clone this repository:
