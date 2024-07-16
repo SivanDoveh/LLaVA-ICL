@@ -33,7 +33,7 @@ from llava.train.llava_trainer import LLaVATrainer
 
 from llava import conversation as conversation_lib
 from llava.model import *
-from llava.mm_utils import tokenizer_image_token
+from llava.mm_utils import tokenizer_image_token,process_anyres_image
 
 from PIL import Image
 
@@ -654,7 +654,38 @@ def preprocess(
 
     return dict(input_ids=input_ids, labels=targets)
 
+def expand2square(pil_img, background_color):
+    width, height = pil_img.size
+    if width == height:
+        return pil_img
+    elif width > height:
+        result = Image.new(pil_img.mode, (width, width), background_color)
+        result.paste(pil_img, (0, (width - height) // 2))
+        return result
+    else:
+        result = Image.new(pil_img.mode, (height, height), background_color)
+        result.paste(pil_img, ((height - width) // 2, 0))
+        return result
+    
+def load_image(image_folder,image_file,valid_extensions=('jpg', 'jpeg', 'png', 'gif','')):
 
+    image_folders = image_folder.split(',')
+
+    for folder in image_folders:
+        image_path = os.path.join(folder, f"{image_file}")
+        if os.path.exists(image_path):
+            image = Image.open(image_path).convert('RGB')
+            return image
+        
+        image_file = image_file.split('.')[0] 
+        for ext in valid_extensions:
+            image_path = os.path.join(folder, f"{image_file}.{ext}")
+            if os.path.exists(image_path):
+                image = Image.open(image_path).convert('RGB')
+                return image
+    print(f"{image_file}")
+    
+                    
 class LazySupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""
 
@@ -688,39 +719,45 @@ class LazySupervisedDataset(Dataset):
             cur_len = cur_len if 'image' in sample else -cur_len
             length_list.append(cur_len)
         return length_list
-
+    
     def __getitem__(self, i) -> Dict[str, torch.Tensor]:
         sources = self.list_data_dict[i]
         if isinstance(i, int):
             sources = [sources]
         assert len(sources) == 1, "Don't know why it is wrapped to a list"  # FIXME
+        
         if 'image' in sources[0]:
+            images_list = []
+            images_size = []
             image_file = self.list_data_dict[i]['image']
             image_folder = self.data_args.image_folder
-            processor = self.data_args.image_processor
-            image = Image.open(os.path.join(image_folder, image_file)).convert('RGB')
-            if self.data_args.image_aspect_ratio == 'pad':
-                def expand2square(pil_img, background_color):
-                    width, height = pil_img.size
-                    if width == height:
-                        return pil_img
-                    elif width > height:
-                        result = Image.new(pil_img.mode, (width, width), background_color)
-                        result.paste(pil_img, (0, (width - height) // 2))
-                        return result
-                    else:
-                        result = Image.new(pil_img.mode, (height, height), background_color)
-                        result.paste(pil_img, ((height - width) // 2, 0))
-                        return result
-                image = expand2square(image, tuple(int(x*255) for x in processor.image_mean))
-                image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
+            
+            if isinstance(image_file, str):
+                image_files = [image_file]
             else:
-                image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
+                image_files = image_file
+            processor = self.data_args.image_processor
+            for image_file in image_files: 
+                image = load_image(image_folder,image_file)
+                if self.data_args.image_aspect_ratio == 'pad':
+                    image = expand2square(image, tuple(int(x*255) for x in processor.image_mean))
+                    image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
+                elif self.data_args.image_aspect_ratio == 'anyres':
+                    image = process_anyres_image(image, processor, self.data_args.image_grid_pinpoints)
+                else:
+                    image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
+
+                images_list.append(image)
+                images_size.append(image.size)
+                
+            sources_copy = [e["conversations"] for e in sources]
             sources = preprocess_multimodal(
-                copy.deepcopy([e["conversations"] for e in sources]),
+                copy.deepcopy(sources_copy),
                 self.data_args)
+            
         else:
-            sources = copy.deepcopy([e["conversations"] for e in sources])
+            sources_copy = [e["conversations"] for e in sources]
+            sources = copy.deepcopy(sources_copy)
         data_dict = preprocess(
             sources,
             self.tokenizer,
@@ -731,7 +768,8 @@ class LazySupervisedDataset(Dataset):
 
         # image exist in the data
         if 'image' in self.list_data_dict[i]:
-            data_dict['image'] = image
+            data_dict['image'] = images_list
+            data_dict['image_size'] = images_size
         elif self.data_args.is_multimodal:
             # image does not exist in the data, but the model is multimodal
             crop_size = self.data_args.image_processor.crop_size
@@ -764,12 +802,29 @@ class DataCollatorForSupervisedDataset(object):
         )
 
         if 'image' in instances[0]:
-            images = [instance['image'] for instance in instances]
-            if all(x is not None and x.shape == images[0].shape for x in images):
-                batch['images'] = torch.stack(images)
+            images = []
+            for instance in instances:
+                cur_img = instance['image']
+                if isinstance(cur_img, list):
+                    images.extend(cur_img)
+                else:
+                    images.append(cur_img)                
+                if all(x is not None and x.shape == images[0].shape for x in images):
+                    batch['images'] = torch.stack(images)
+                else:
+                    batch['images'] = images
+        image_sizes = []
+        for instance in instances:
+            if 'image_size' not in instance:
+                cur_img_size = [None]
             else:
-                batch['images'] = images
-
+                if isinstance(instance['image_size'], list):
+                    cur_img_size = instance['image_size']
+                else:
+                    cur_img_size = [instance['image_size']]
+            image_sizes.extend(cur_img_size)
+        batch['image_sizes'] = image_sizes
+        
         return batch
 
 
@@ -908,6 +963,30 @@ def train(attn_implementation=None):
             conversation_lib.default_conversation = conversation_lib.conv_templates["vicuna_v1"]
 
     if model_args.vision_tower is not None:
+
+        data_args.image_grid_pinpoints = [ 
+            [
+                336,
+                672
+            ],
+            [
+                672,
+                336
+            ],
+            [
+                672,
+                672
+            ],
+            [
+                1008,
+                336
+            ],
+            [
+                336,
+                1008
+            ]
+        ]
+
         model.get_model().initialize_vision_modules(
             model_args=model_args,
             fsdp=training_args.fsdp
@@ -988,4 +1067,4 @@ def train(attn_implementation=None):
 
 
 if __name__ == "__main__":
-    train()
+    train(attn_implementation="flash_attention_2")
