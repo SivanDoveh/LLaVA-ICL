@@ -1,7 +1,9 @@
-# :heart_eyes_cat: LLaVA-ICL
-## Relies heavily on LLaVA. Start by having a working LLaVA environment.
+# :heart_eyes_cat: LLaVA-ICL (Towards Multimodal In-Context Learning for Vision & Language Models)
 
-First, clone this repository:
+Towards Multimodal In-Context Learning for Vision & Language Models paper page: https://arxiv.org/abs/2403.12736 
+______________________
+- Relies heavily on LLaVA. Start by having a working LLaVA environment.
+- After you have a working llava env, clone this repository:
 
 ```bash
 git clone git@github.com:SivanDoveh/LLaVA.git
