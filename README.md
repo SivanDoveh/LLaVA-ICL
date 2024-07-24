@@ -2,6 +2,7 @@
 
 Towards Multimodal In-Context Learning for Vision & Language Models paper page: https://arxiv.org/abs/2403.12736 
 ______________________
+- model in https://huggingface.co/sivand/LLAVA-ICL/tree/main/icl-llava-pad
 - Relies heavily on LLaVA. Start by having a working LLaVA environment.
 - After you have a working llava env, clone this repository:
 
