@@ -44,7 +44,6 @@ LLaVA-ICL
 - Link to files for LLava-ICL [https://drive.google.com/drive/folders/1Zb3sqQaD23gOc0flHqeBmGdFv0T_55kw?usp=sharing]
   - training_data_mix folder contains training data (mix of multiple choices, question answering, and captioning tasks built from VL checklist and SEED Bench(1-4)
   - FS_pkls folder contains pkl files for *TEST* Few Shot tasks built on 5 datasets (food 101, flowers, CUB, Stanford dogs, and Stanford cars) in a format that ICL_model_vqa_FS.py knows to process for evaluation.
-  - The model folder contains a trained LLAVA-ICL Model that can be evaluated just like vanilla-lava but also on img+text sequences.
 
 ## Few Shot Classification Evaluations on our FS-ICL data
 - To evaluate our LLaVa-ICL model on a single FS data(episode path= the path for that FS JSON you should have downloaded from the drive), you can use this line:
