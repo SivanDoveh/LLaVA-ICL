@@ -11,39 +11,62 @@ git clone git@github.com:SivanDoveh/LLaVA.git
 cd LLAVA-ICL
 ```
 
-## Data Preparation
-```bash
-LLaVA-ICL
-├── ALL LLaVA files and folders
-│   ├── ...
-├── FS_pkls
+# Data Preparation
+
+## Directory Structure
+This project requires specific datasets to be organized in a particular directory structure. Please follow these steps:
+
+1. Download the following datasets:
+   - CUB-200-2011
+   - Oxford 102 Flower
+   - Stanford Dogs Dataset
+   - Food-101
+   - Stanford Cars
+
+2. Create and organize the project directory as shown below:
+
+```
+LLaVA-ICL/
+├── ALL LLaVA files and folders/
+│   └── ...
+├── FS_pkls/
 │   ├── CUB_2way_1shot_episodes.pkl
-│   ├── ...
-├── data
-│   ├── CUB
-│   │   ├── CUB_200_2011
-│   │   │   ├── images
-│   │   │   │   ├── 17.Clay_colored_Sparrow
-│   │   │   │   ├── ...
-│   ├── flowers
-│   │   ├── jpg
-│   ├── stanford_dogs
-│   │   ├── Images
-│   │   │   ├── n02097298-Scotch_terrier
-│   │   │   ├── ...
-│   ├── food_101
-│   │   ├── images
-│   │   │   ├── caesar_salad
-│   │   │   ├── ...
-│   ├── stanford_cars
-│   │   ├── images
-│   ├── ...
-├── ...
+│   └── ...
+├── data/
+│   ├── CUB/
+│   │   └── CUB_200_2011/
+│   │       └── images/
+│   │           ├── 17.Clay_colored_Sparrow/
+│   │           └── ...
+│   ├── flowers/
+│   │   └── jpg/
+│   ├── stanford_dogs/
+│   │   └── Images/
+│   │       ├── n02097298-Scotch_terrier/
+│   │       └── ...
+│   ├── food_101/
+│   │   └── images/
+│   │       ├── caesar_salad/
+│   │       └── ...
+│   └── stanford_cars/
+│       └── images/
+└── ...
 ```
 
-- Link to files for LLava-ICL [https://drive.google.com/drive/folders/1Zb3sqQaD23gOc0flHqeBmGdFv0T_55kw?usp=sharing]
-  - training_data_mix folder contains training data (mix of multiple choices, question answering, and captioning tasks built from VL checklist and SEED Bench(1-4)
-  - FS_pkls folder contains pkl files for *TEST* Few Shot tasks built on 5 datasets (food 101, flowers, CUB, Stanford dogs, and Stanford cars) in a format that ICL_model_vqa_FS.py knows to process for evaluation.
+Place each dataset in its corresponding directory under `data/`:
+- CUB-200-2011 → `data/CUB/CUB_200_2011/images/`
+- Oxford 102 Flower → `data/flowers/jpg/`
+- Stanford Dogs → `data/stanford_dogs/Images/`
+- Food-101 → `data/food_101/images/`
+- Stanford Cars → `data/stanford_cars/images/`
+
+
+## Few Shot Task Files
+**Important**: Download the FS_pkls from [here](https://drive.google.com/drive/folders/1Zb3sqQaD23gOc0flHqeBmGdFv0T_55kw?usp=sharing)
+- These pkl files contain *TEST* Few Shot tasks built on all 5 datasets in a format that ICL_model_vqa_FS.py knows to process for evaluation.
+
+## Training data
+- training_data_mix folder contains LLaVA style training data (mix of multiple choices, question answering, and captioning tasks built from VL checklist and SEED Bench(1-4)
 
 ## Few Shot Classification Evaluations on our FS-ICL data
 - To evaluate our LLaVa-ICL model on a single FS data(episode path= the path for that FS JSON you should have downloaded from the drive), you can use this line:
