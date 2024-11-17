@@ -10,7 +10,6 @@ ______________________
 git clone git@github.com:SivanDoveh/LLaVA.git
 cd LLAVA-ICL
 ```
-Link to files for LLava-ICL [https://drive.google.com/drive/folders/1Zb3sqQaD23gOc0flHqeBmGdFv0T_55kw?usp=sharing]
 
 ## Data Preparation
 ```bash
